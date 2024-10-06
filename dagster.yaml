@@ -1,25 +1,63 @@
-storage:
-  postgres:
+scheduler:
+  module: dagster.core.scheduler
+  class: DagsterDaemonScheduler
+
+run_coordinator:
+  module: dagster.core.run_coordinator
+  class: QueuedRunCoordinator
+
+run_launcher:
+  module: dagster_docker
+  class: DockerRunLauncher
+  config:
+    env_vars:
+      - DAGSTER_PG_USERNAME
+      - DAGSTER_PG_PASSWORD
+      - DAGSTER_PG_DB
+    network: dagster-bridge-network
+    container_kwargs:
+      volumes: # Make docker client accessible to any launched containers as well
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /tmp/io_manager_storage:/tmp/io_manager_storage
+
+run_storage:
+  module: dagster_postgres.run_storage
+  class: PostgresRunStorage
+  config:
     postgres_db:
+      hostname: dagster-postgres
       username:
         env: DAGSTER_PG_USERNAME
       password:
         env: DAGSTER_PG_PASSWORD
-      hostname:
-        env: DAGSTER_PG_HOST
       db_name:
         env: DAGSTER_PG_DB
       port: 5432
 
-compute_logs:
-  module: dagster_aws.s3.compute_log_manager
-  class: S3ComputeLogManager
+schedule_storage:
+  module: dagster_postgres.schedule_storage
+  class: PostgresScheduleStorage
   config:
-    bucket: "mycorp-dagster-compute-logs"
-    prefix: "dagster-test-"
+    postgres_db:
+      hostname: dagster-postgres
+      username:
+        env: DAGSTER_PG_USERNAME
+      password:
+        env: DAGSTER_PG_PASSWORD
+      db_name:
+        env: DAGSTER_PG_DB
+      port: 5432
 
-local_artifact_storage:
-  module: dagster.core.storage.root
-  class: LocalArtifactStorage
+event_log_storage:
+  module: dagster_postgres.event_log
+  class: PostgresEventLogStorage
   config:
-    base_dir: "/opt/dagster/local/"
+    postgres_db:
+      hostname: dagster-postgres
+      username:
+        env: DAGSTER_PG_USERNAME
+      password:
+        env: DAGSTER_PG_PASSWORD
+      db_name:
+        env: DAGSTER_PG_DB
+      port: 5432
