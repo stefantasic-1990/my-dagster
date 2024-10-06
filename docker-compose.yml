@@ -30,66 +30,68 @@ services:
       DAGSTER_POSTGRES_DB: "dagster_database"
       DAGSTER_CURRENT_IMAGE: "dagster-code-location:latest"
     volumes:
-      - ./repo.py:/opt/dagster/repo.py
+      - ./repo.py:/opt/dagster/app/repo.py
     networks:
       - dagster-bridge-network
 
-  # # This service runs dagster-webserver, which loads your user code from the user code container.
-  # # Since our instance uses the QueuedRunCoordinator, any runs submitted from the webserver will be put on
-  # # a queue and later dequeued and launched by dagster-daemon.
-  # dagster-webserver:
-  #   build:
-  #     context: .
-  #     dockerfile: ./Dockerfile-dagster
-  #   entrypoint:
-  #     - dagster-webserver
-  #     - -h
-  #     - "0.0.0.0"
-  #     - -p
-  #     - "3000"
-  #     - -w
-  #     - workspace.yaml
-  #   container_name: dagster-webserver
-  #   expose:
-  #     - "3000"
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     DAGSTER_POSTGRES_USER: "dagster_user"
-  #     DAGSTER_POSTGRES_PASSWORD: "dagster_password"
-  #     DAGSTER_POSTGRES_DB: "dagster_database"
-  #   volumes: # Make docker client accessible so we can terminate containers from the webserver
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - /tmp/io_manager_storage:/tmp/io_manager_storage
-  #   networks:
-  #     - dagster-bridge-network
-  #   depends_on:
-  #     - dagster-postgres
-  #     - dagster-code-location
+  # This service runs dagster-webserver, which loads your user code from the user code container.
+  # Since our instance uses the QueuedRunCoordinator, any runs submitted from the webserver will be put on
+  # a queue and later dequeued and launched by dagster-daemon.
+  dagster-webserver:
+    build:
+      context: .
+      dockerfile: ./Dockerfile-dagster
+    entrypoint:
+      - dagster-webserver
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    container_name: dagster-webserver
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    environment:
+      DAGSTER_PG_USERNAME: "dagster_user"
+      DAGSTER_PG_PASSWORD: "dagster_password"
+      DAGSTER_PG_HOST: "dagster-postgres"
+      DAGSTER_PG_DB: "dagster_database"
+    volumes: # Make docker client accessible so we can terminate containers from the webserver
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+    networks:
+      - dagster-bridge-network
+    depends_on:
+      - dagster-postgres
+      - dagster-code-location
 
-  # # This service runs the dagster-daemon process, which is responsible for taking runs
-  # # off of the queue and launching them, as well as creating runs from schedules or sensors.
-  # dagster-daemon:
-  #   build:
-  #     context: .
-  #     dockerfile: ./Dockerfile-dagster
-  #   entrypoint:
-  #     - dagster-daemon
-  #     - run
-  #   container_name: dagster-daemon
-  #   restart: on-failure
-  #   environment:
-  #     DAGSTER_POSTGRES_USER: "dagster_user"
-  #     DAGSTER_POSTGRES_PASSWORD: "dagster_password"
-  #     DAGSTER_POSTGRES_DB: "dagster_database"
-  #   volumes: # Make docker client accessible so we can launch containers using host docker
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - /tmp/io_manager_storage:/tmp/io_manager_storage
-  #   networks:
-  #     - dagster-bridge-network
-  #   depends_on:
-  #     - dagster-postgres
-  #     - dagster-code-location
+  # This service runs the dagster-daemon process, which is responsible for taking runs
+  # off of the queue and launching them, as well as creating runs from schedules or sensors.
+  dagster-daemon:
+    build:
+      context: .
+      dockerfile: ./Dockerfile-dagster
+    entrypoint:
+      - dagster-daemon
+      - run
+    container_name: dagster-daemon
+    restart: on-failure
+    environment:
+      DAGSTER_PG_USERNAME: "dagster_user"
+      DAGSTER_PG_PASSWORD: "dagster_password"
+      DAGSTER_PG_HOST: "dagster-postgres"
+      DAGSTER_PG_DB: "dagster_database"
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+    networks:
+      - dagster-bridge-network
+    depends_on:
+      - dagster-postgres
+      - dagster-code-location
 
 networks:
   dagster-bridge-network:
