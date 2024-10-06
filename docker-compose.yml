@@ -31,6 +31,8 @@ services:
       DAGSTER_POSTGRES_PASSWORD: "dagster_password"
       DAGSTER_POSTGRES_DB: "dagster_database"
       DAGSTER_CURRENT_IMAGE: "dagster-code-location:latest"
+    volumes:
+      - ./repo.py:/opt/dagster/app
     networks:
       - dagster-bridge-network
 
