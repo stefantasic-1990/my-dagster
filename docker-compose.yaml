@@ -1,6 +1,16 @@
 services:
-  # This service runs the postgres DB used by dagster for run storage, schedule storage,
-  # and event log storage.
+  source-sftp:
+    image: atmoz/sftp:latest
+    container_name: source-sftp
+    volumes:
+      - ./users.conf:/etc/sftp/users.conf:ro
+    command:
+      - dagster-user:dagster-password:::incoming
+    ports:
+      - "2222:22"
+    networks:
+      - dagster-bridge-network
+
   dagster-postgres:
     image: postgres:11
     container_name: dagster-postgres
@@ -11,12 +21,6 @@ services:
     networks:
       - dagster-bridge-network
 
-  # This service runs the gRPC server that loads your user code, in both dagster-webserver
-  # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
-  # run launcher to use this same image when launching runs in a new container as well.
-  # Multiple containers like this can be deployed separately - each just needs to run on
-  # its own port, and have its own entry in the workspace.yaml file that's loaded by the
-      # webserver.
   dagster-code-location:
     build:
       context: .
@@ -34,9 +38,6 @@ services:
     networks:
       - dagster-bridge-network
 
-  # This service runs dagster-webserver, which loads your user code from the user code container.
-  # Since our instance uses the QueuedRunCoordinator, any runs submitted from the webserver will be put on
-  # a queue and later dequeued and launched by dagster-daemon.
   dagster-webserver:
     build:
       context: .
@@ -59,7 +60,7 @@ services:
       DAGSTER_PG_PASSWORD: "dagster_password"
       DAGSTER_PG_HOST: "dagster-postgres"
       DAGSTER_PG_DB: "dagster_database"
-    volumes: # Make docker client accessible so we can terminate containers from the webserver
+    volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
     networks:
@@ -68,8 +69,6 @@ services:
       - dagster-postgres
       - dagster-code-location
 
-  # This service runs the dagster-daemon process, which is responsible for taking runs
-  # off of the queue and launching them, as well as creating runs from schedules or sensors.
   dagster-daemon:
     build:
       context: .
@@ -84,7 +83,7 @@ services:
       DAGSTER_PG_PASSWORD: "dagster_password"
       DAGSTER_PG_HOST: "dagster-postgres"
       DAGSTER_PG_DB: "dagster_database"
-    volumes: # Make docker client accessible so we can launch containers using host docker
+    volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
     networks:
