@@ -1,3 +1,10 @@
+x-dagster-common-env: &common-env
+  environment:
+    DAGSTER_PG_USERNAME: "dagster_user"
+    DAGSTER_PG_PASSWORD: "dagster_password"
+    DAGSTER_PG_HOST: "dagster-postgres"
+    DAGSTER_PG_DB: "dagster_database"
+
 services:
   dagster-source-sftp:
     image: atmoz/sftp:latest
@@ -28,15 +35,11 @@ services:
     container_name: dagster-code-location
     image: dagster-code-location:latest
     restart: always
-    environment:
-      DAGSTER_POSTGRES_USER: "dagster_user"
-      DAGSTER_POSTGRES_PASSWORD: "dagster_password"
-      DAGSTER_POSTGRES_DB: "dagster_database"
-      DAGSTER_CURRENT_IMAGE: "dagster-code-location:latest"
     volumes:
       - ./repo.py:/opt/dagster/app/repo.py
     networks:
       - dagster-bridge-network
+    <<: *common-env
 
   dagster-webserver:
     build:
@@ -55,11 +58,6 @@ services:
       - "3000"
     ports:
       - "3000:3000"
-    environment:
-      DAGSTER_PG_USERNAME: "dagster_user"
-      DAGSTER_PG_PASSWORD: "dagster_password"
-      DAGSTER_PG_HOST: "dagster-postgres"
-      DAGSTER_PG_DB: "dagster_database"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
@@ -68,6 +66,7 @@ services:
     depends_on:
       - dagster-postgres
       - dagster-code-location
+    <<: *common-env
 
   dagster-daemon:
     build:
@@ -78,11 +77,6 @@ services:
       - run
     container_name: dagster-daemon
     restart: on-failure
-    environment:
-      DAGSTER_PG_USERNAME: "dagster_user"
-      DAGSTER_PG_PASSWORD: "dagster_password"
-      DAGSTER_PG_HOST: "dagster-postgres"
-      DAGSTER_PG_DB: "dagster_database"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
@@ -91,6 +85,7 @@ services:
     depends_on:
       - dagster-postgres
       - dagster-code-location
+    <<: *common-env
 
 networks:
   dagster-bridge-network:
