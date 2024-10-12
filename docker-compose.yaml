@@ -5,6 +5,10 @@ x-dagster-common-env: &common-env
     DAGSTER_PG_HOST: "dagster-postgres"
     DAGSTER_PG_DB: "dagster_database"
 
+x-dagster-common-net: &common-net
+  network:
+    - dagster-bridge-network
+
 services:
   dagster-source-sftp:
     image: atmoz/sftp:latest
@@ -15,8 +19,7 @@ services:
       - dagster-user:dagster-password:::incoming
     ports:
       - "2222:22"
-    networks:
-      - dagster-bridge-network
+    <<: *common-net
 
   dagster-postgres:
     image: postgres:11
@@ -25,8 +28,7 @@ services:
       POSTGRES_USER: "dagster_user"
       POSTGRES_PASSWORD: "dagster_password"
       POSTGRES_DB: "dagster_database"
-    networks:
-      - dagster-bridge-network
+    <<: *common-net
 
   dagster-code-location:
     build:
@@ -37,8 +39,7 @@ services:
     restart: always
     volumes:
       - ./repo.py:/opt/dagster/app/repo.py
-    networks:
-      - dagster-bridge-network
+    <<: *common-net
     <<: *common-env
 
   dagster-webserver:
@@ -61,11 +62,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
-    networks:
-      - dagster-bridge-network
     depends_on:
       - dagster-postgres
       - dagster-code-location
+    <<: *common-net
     <<: *common-env
 
   dagster-daemon:
@@ -80,11 +80,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/io_manager_storage:/tmp/io_manager_storage
-    networks:
-      - dagster-bridge-network
     depends_on:
       - dagster-postgres
       - dagster-code-location
+    <<: *common-net
     <<: *common-env
 
 networks:
