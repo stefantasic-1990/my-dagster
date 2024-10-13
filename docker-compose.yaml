@@ -25,6 +25,8 @@ services:
       POSTGRES_USER: "dagster_user"
       POSTGRES_PASSWORD: "dagster_password"
       POSTGRES_DB: "dagster_database"
+    ports:
+      - "5432:5432"
     networks:
       - dagster-bridge-network
 

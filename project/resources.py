@@ -6,10 +6,17 @@ class SFTPResource(ConfigurableResource):
     username: str
     password: str
 
-    def connect(self):
+    def get_file_list(self, dir):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=self.hostname, port=22, username=self.username, password=self.password)
-        client = ssh.open_sftp()
+        files = ssh.open_sftp().listdir(f"{dir}")
+        ssh.close()
 
-        return client
+        return files
+
+    def get_file(self, path):
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=self.hostname, port=22, username=self.username, password=self.password)
+        sftp = ssh.open_sftp()
