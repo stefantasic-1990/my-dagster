@@ -1,9 +1,13 @@
-from dagster import asset
+from dagster import asset, MaterializeResult
 from resources import SFTPResource
 
 @asset
-def source_json_sftp(sftp_source: SFTPResource) -> list:
+def source_json_sftp(sftp_source: SFTPResource) -> MaterializeResult:
     conn = sftp_source.connect()
     file_list = conn.listdir("/incoming/")
 
-    return file_list
+    return MaterializeResult(
+        metadata={
+            "files": str(file_list)
+        }
+    )
