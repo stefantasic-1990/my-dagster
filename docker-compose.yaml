@@ -36,7 +36,7 @@ services:
     image: dagster-code-location:latest
     restart: always
     volumes:
-      - ./repo.py:/opt/dagster/app/repo.py
+      - ./project/.:/opt/dagster/app/
     networks:
       - dagster-bridge-network
     <<: *common-env
