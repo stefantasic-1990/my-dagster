@@ -10,7 +10,7 @@ services:
     image: atmoz/sftp:latest
     container_name: dagster-source-sftp
     volumes:
-      - ./incoming/:/incoming/:ro
+      - ./incoming/:/home/dagster-user/incoming/:ro
     command:
       - dagster-user:dagster-password:::incoming
     ports:
