@@ -35,8 +35,6 @@ services:
     container_name: dagster-code-location
     image: dagster-code-location:latest
     restart: always
-    volumes:
-      - ./project/.:/opt/dagster/app/
     networks:
       - dagster-bridge-network
     <<: *common-env

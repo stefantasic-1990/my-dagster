@@ -17,7 +17,7 @@ run_launcher:
       - DAGSTER_PG_DB
     network: dagster-bridge-network
     container_kwargs:
-      volumes: # Make docker client accessible to any launched containers as well
+      volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - /tmp/io_manager_storage:/tmp/io_manager_storage
 
