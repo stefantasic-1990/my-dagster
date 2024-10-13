@@ -10,6 +10,7 @@ run_launcher:
   module: dagster_docker
   class: DockerRunLauncher
   config:
+    image: "dagster-code-location:latest"
     env_vars:
       - DAGSTER_PG_USERNAME
       - DAGSTER_PG_PASSWORD
