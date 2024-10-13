@@ -3,4 +3,4 @@ load_from:
   - grpc_server:
       host: dagster-code-location
       port: 4000
-      location_name: "definitions.py"
+      location_name: "/opt/dagster/app/definitions.py"
