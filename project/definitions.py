@@ -10,6 +10,6 @@ defs = Definitions(
     assets=[source_json_sftp],
     jobs=[ingest_source_data],
     resources={
-        "sftp_source": SFTPResource(host="dagster-source-sftp", username="dagster-user", password="dagster-password")
+        "sftp_source": SFTPResource(hostname="dagster-source-sftp", username="dagster-user", password="dagster-password")
     },
 )

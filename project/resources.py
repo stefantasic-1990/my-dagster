@@ -1,15 +1,15 @@
+import paramiko
 from dagster import ConfigurableResource
-from paramiko import SSHClient
 
 class SFTPResource(ConfigurableResource):
-    host: str
+    hostname: str
     username: str
     password: str
 
-    def connect(self, host: str, username: str, password: str):
+    def connect(self):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(host=host, port=22, username=username, password=password)
+        ssh.connect(hostname=self.hostname, port=22, username=self.username, password=self.password)
         client = ssh.open_sftp()
 
         return client
