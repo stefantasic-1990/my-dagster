@@ -1,5 +1,3 @@
-# Dagster libraries required to run both the webserver and the daemon.
-
 FROM python:3.10-slim
 
 RUN pip install \
@@ -9,7 +7,6 @@ RUN pip install \
     dagster-postgres \
     dagster-docker
 
-# Set $DAGSTER_HOME and copy dagster instance and workspace YAML there
 ENV DAGSTER_HOME=/opt/dagster/dagster_home/
 
 RUN mkdir -p $DAGSTER_HOME
