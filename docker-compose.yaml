@@ -6,17 +6,32 @@ x-dagster-common-env: &common-env
     DAGSTER_PG_DB: "dagster_database"
 
 services:
-  dagster-source-sftp:
+  dagster-sftp:
     image: atmoz/sftp:latest
-    container_name: dagster-source-sftp
+    platform: linux/amd64
+    container_name: dagster-sftp
     volumes:
       - ./incoming/:/home/dagster-user/incoming/:ro
     command:
-      - dagster-user:dagster-password:::incoming
+      - dagster_user:dagster_password:::incoming
     ports:
       - "2222:22"
     networks:
       - dagster-bridge-network
+
+  dagster-mysql:
+    image: mysql:8
+    container_name: dagster-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: dagster_data
+      MYSQL_USER: dagster_user
+      MYSQL_PASSWORD: dagster_password
+    ports:
+      - "3306:3306"
+    networks:
+      - dagster-bridge-network
+
 
   dagster-postgres:
     image: postgres:11
