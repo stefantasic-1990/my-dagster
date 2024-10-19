@@ -27,11 +27,12 @@ services:
       MYSQL_DATABASE: dagster_data
       MYSQL_USER: dagster_user
       MYSQL_PASSWORD: dagster_password
+    volumes:
+      - ./mysql-init.sh:/docker-entrypoint-initdb.d/mysql-init.sh
     ports:
       - "3306:3306"
     networks:
       - dagster-bridge-network
-
 
   dagster-postgres:
     image: postgres:11
