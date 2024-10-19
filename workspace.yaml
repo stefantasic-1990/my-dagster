@@ -1,5 +1,4 @@
 load_from:
-  # Each entry here corresponds to a container that exposes a gRPC server.
   - grpc_server:
       host: dagster-code-location
       port: 4000
