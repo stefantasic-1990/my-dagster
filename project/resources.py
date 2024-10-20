@@ -20,3 +20,12 @@ class SFTPResource(ConfigurableResource):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=self.hostname, port=22, username=self.username, password=self.password)
         sftp = ssh.open_sftp()
+
+# class MySQLResource(ConfigurableResource):
+#     hostname: str
+#     username: str
+#     password: str
+#     database: str
+#     port: int
+
+#     def get_table_count(self, table):
