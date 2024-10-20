@@ -1,11 +1,7 @@
-from dagster import Definitions, define_asset_job
+from dagster import Definitions
 from resources import SFTPResource
 from assets import sftp_pokemon_csv
-
-ingest_source_data = define_asset_job(
-    name="ingest_source_data",
-    selection=["sftp_pokemon_csv"]
-)
+from jobs import ingest_source_data
 
 defs = Definitions(
     assets=[sftp_pokemon_csv],
