@@ -1,6 +1,5 @@
 # Ensure that this file has the correct permissions so that the container can access it
 # You can run 'chmod +x ./mysql-init.sh' to grant the permissions
-
 #!/bin/bash
 
 DB_HOST="localhost"
